@@ -463,6 +463,32 @@ write_selfinsert_char_arg_ctrl(const Arg *arg)
 
 /******************************************************************************/
 
+static void
+write_var_arg(const Arg *arg)
+{
+    char *str = getenv(arg->s);
+    if (!str)
+        return;
+
+    while (*str != '\0')
+    {
+        write_char(str, 0);
+        str += char_length(*str);
+    }
+}
+
+/******************************************************************************/
+
+#define DEF_VARINSERT_KEY_WITH_ALT(keycode, var, shift_var) \
+    DEF_SELFINSERT_KEY_NOLOCK(0,        keycode), \
+    DEF_SELFINSERT_KEY_NOLOCK(LockMask, keycode), \
+    { MODKEY,                    keycode, write_var_arg, {.s = var} }, \
+    { MODKEY|LockMask,           keycode, write_var_arg, {.s = var} }, \
+    { MODKEY|ShiftMask,          keycode, write_var_arg, {.s = shift_var} }, \
+    { MODKEY|ShiftMask|LockMask, keycode, write_var_arg, {.s = shift_var} }
+
+/******************************************************************************/
+
 #define DEF_FUNCTION(mod, keycode, fun, arg) \
     { mod, keycode, fun, arg }, \
     { mod|LockMask, keycode, fun, arg }
@@ -516,11 +542,11 @@ static Shortcut shortcuts[] = {
     // top row
     DEF_SELFINSERT_KEY(23), // Tab
     DEF_SELFINSERT_KEY_WITH_ALT(24, "`", "~"), // q
-    DEF_SELFINSERT_KEY_WITH_ALT(25, "¬", "´"), // w
-    DEF_SELFINSERT_KEY_WITH_ALT(26, "°", "‰"), // e
-    DEF_SELFINSERT_KEY_WITH_ALT(27, "·", "¤"), // r
-    DEF_SELFINSERT_KEY_WITH_ALT(28, "±", "∓"), // t
-    DEF_SELFINSERT_KEY_WITH_ALT(29, "µ", "¦"), // y
+    DEF_VARINSERT_KEY_WITH_ALT(25, "ST_W0", "ST_W1"), // w
+    DEF_VARINSERT_KEY_WITH_ALT(26, "ST_E0", "ST_E1"), // e
+    DEF_VARINSERT_KEY_WITH_ALT(27, "ST_R0", "ST_R1"), // r
+    DEF_VARINSERT_KEY_WITH_ALT(28, "ST_T0", "ST_T1"), // t
+    DEF_VARINSERT_KEY_WITH_ALT(29, "ST_Y0", "ST_Y1"), // y
     DEF_SELFINSERT_KEY_WITH_ALT(30, "\\", "|"), // u
     DEF_SELFINSERT_KEY_WITH_ALT(31, "-", "_"), // i
     DEF_SELFINSERT_KEY_WITH_ALT(32, "=", "+"), // o
@@ -544,12 +570,12 @@ static Shortcut shortcuts[] = {
 
     // bottom row
     DEF_SELFINSERT_KEY_WITH_ALT(51, "\\", "|"), // Backslash
-    DEF_SELFINSERT_KEY_WITH_ALT(52, "¶", "§"), // z
-    DEF_SELFINSERT_KEY_WITH_ALT(53, "×", "÷"), // x
-    DEF_SELFINSERT_KEY_WITH_ALT(54, "©", "®"), // c
+    DEF_VARINSERT_KEY_WITH_ALT(52, "ST_Z0", "ST_Z1"), // z
+    DEF_VARINSERT_KEY_WITH_ALT(53, "ST_X0", "ST_X1"), // x
+    DEF_VARINSERT_KEY_WITH_ALT(54, "ST_C0", "ST_C1"), // c
     DEF_SELFINSERT_KEY_WITH_ALT(55, "5", "%"), // v
-    DEF_SELFINSERT_KEY_WITH_ALT(56, "¡", "«"), // b
-    DEF_SELFINSERT_KEY_WITH_ALT(57, "¿", "»"), // n
+    DEF_VARINSERT_KEY_WITH_ALT(56, "ST_B0", "ST_B1"), // b
+    DEF_VARINSERT_KEY_WITH_ALT(57, "ST_N0", "ST_N1"), // n
     DEF_SELFINSERT_KEY_WITH_ALT(58, "6", "^"), // m
     DEF_SELFINSERT_KEY_WITH_ALT(59, ",", "<"), // ,
     DEF_SELFINSERT_KEY_WITH_ALT(60, ".", ">"), // .
