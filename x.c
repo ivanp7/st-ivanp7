@@ -23,7 +23,7 @@ char *argv0;
 /* types used in config.h */
 typedef struct {
 	uint mod;
-	KeySym keysym;
+	KeyCode keycode;
 	void (*func)(const Arg *);
 	const Arg arg;
 } Shortcut;
@@ -1834,6 +1834,7 @@ kpress(XEvent *ev)
 {
 	XKeyEvent *e = &ev->xkey;
 	KeySym ksym;
+	KeyCode kcode;
 	char buf[64], *customkey;
 	int len;
 	Rune c;
@@ -1847,9 +1848,10 @@ kpress(XEvent *ev)
 		len = XmbLookupString(xw.ime.xic, e, buf, sizeof buf, &ksym, &status);
 	else
 		len = XLookupString(e, buf, sizeof buf, &ksym, NULL);
+	kcode = e->keycode;
 	/* 1. shortcuts */
 	for (bp = shortcuts; bp < shortcuts + LEN(shortcuts); bp++) {
-		if (ksym == bp->keysym && match(bp->mod, e->state)) {
+		if (kcode == bp->keycode && match(bp->mod, e->state)) {
 			bp->func(&(bp->arg));
 			return;
 		}
