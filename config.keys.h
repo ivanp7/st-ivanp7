@@ -247,12 +247,8 @@ static Shortcut shortcuts[] = {
     DEF_FUNCTION( MODKEY,               110 /*XK_Home*/,        zoomreset,      {.f =  0} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  111 /*XK_Up*/,          zoom,           {.f = +1} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  116 /*XK_Down*/,        zoom,           {.f = -1} ),
-    // FIXME DEF_FUNCTION( TERMMOD|ControlMask,  113 /*XK_Left*/,        changealpha,    {.f = -0.05} ),
-    // FIXME DEF_FUNCTION( TERMMOD|ControlMask,  114 /*XK_Right*/,       changealpha,    {.f = +0.05} ),
-
-    /* { MODKEY,               XK_l,           externalpipe,   {.v = openurlcmd } }, */
-    /* DEF_FUNCTION( MODKEY|ControlMask,   XK_y,            externalpipe,   {.v = copyurlcmd } ), */
-    /* DEF_FUNCTION( MODKEY|ControlMask,   XK_o,            externalpipe,   {.v = copyoutput } ), */
+    DEF_FUNCTION( TERMMOD|ControlMask,  113 /*XK_Left*/,        changealpha,    {.f = -0.05} ),
+    DEF_FUNCTION( TERMMOD|ControlMask,  114 /*XK_Right*/,       changealpha,    {.f = +0.05} ),
 
     /* Input */
     DEF_FUNCTION( 0,                    108 /*XK_Alt_R*/,       switch_language, {} ),
