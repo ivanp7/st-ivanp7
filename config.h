@@ -95,18 +95,18 @@ char *termname = "st-256color";
  * the st.info and appropriately install the st.info in the environment where
  * you use this st version.
  *
- *	it#$tabspaces,
+ *   it#$tabspaces,
  *
  * Secondly make sure your kernel is not expanding tabs. When running `stty
  * -a` »tab0« should appear. You can tell the terminal to not expand tabs by
  *  running following command:
  *
- *	stty tabs
+ *   stty tabs
  */
 unsigned int tabspaces = 4;
 
 /* bg opacity */
-float alpha = 0.8, alphaUnfocused = 0.7;
+float alpha = 0.85, alphaUnfocused = 0.65, alphaOffset = -0.20;
 
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
@@ -149,6 +149,10 @@ static const char *colorname[] = {
     [255] = 0,
 
     /* more colors can be added after 255 to use with DefaultXX */
+    /* "#cccccc", */
+    /* "#555555", */
+    /* "gray90", /1* default foreground colour *1/ */
+    /* "black", /1* default background colour *1/ */
 
     /* special colors */
     [256] = "#add8e6", /* cursor */
@@ -160,12 +164,6 @@ static const char *colorname[] = {
     [260] = "#0ef096", /* cursor, alternative layout */
     [261] = "#ffc7d5", /* cursor, alternative language */
 };
-/* static const char *colorname[] = { */
-/* 	"#cccccc", */
-/* 	"#555555", */
-    /* "gray90", /1* default foreground colour *1/ */
-    /* "black", /1* default background colour *1/ */
-/* }; */
 
 
 /*
@@ -253,7 +251,7 @@ ResourcePref resources[] = {
     { "cwscale",        FLOAT,      &cwscale },
     { "chscale",        FLOAT,      &chscale },
     { "alpha",          FLOAT,      &alpha },
-    { "alphaUnfocused", FLOAT,      &alphaUnfocused },
+    { "alphaOffset",    FLOAT,      &alphaOffset },
 };
 
 /*

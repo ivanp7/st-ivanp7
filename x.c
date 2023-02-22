@@ -79,7 +79,7 @@ static void clippaste(const Arg *);
 static void numlock(const Arg *);
 static void selpaste(const Arg *);
 static void changealpha(const Arg *);
-static void changealphaUnf(const Arg *);
+static void changealphaOffset(const Arg *);
 static void zoom(const Arg *);
 static void zoomabs(const Arg *);
 static void zoomreset(const Arg *);
@@ -334,19 +334,19 @@ changealpha(const Arg *arg)
     if((alpha > 0 && arg->f < 0) || (alpha < 1 && arg->f > 0))
         alpha += arg->f;
     alpha = clamp(alpha, 0.0, 1.0);
-    alphaUnfocused = clamp(alphaUnfocused, 0.0, 1.0);
+    alphaUnfocused = clamp(alpha+alphaOffset, 0.0, 1.0);
 
     xloadcols();
     redraw();
 }
 
 void
-changealphaUnf(const Arg *arg)
+changealphaOffset(const Arg *arg)
 {
-    if((alphaUnfocused > 0 && arg->f < 0) || (alphaUnfocused < 1 && arg->f > 0))
-        alphaUnfocused += arg->f;
-    alphaUnfocused = clamp(alphaUnfocused, 0.0, 1.0);
-    alpha = clamp(alpha, 0.0, 1.0);
+    if((alphaOffset > -1 && arg->f < 0) || (alphaOffset < 1 && arg->f > 0))
+        alphaOffset += arg->f;
+    alphaOffset = clamp(alphaOffset, -1.0, 1.0);
+    alphaUnfocused = clamp(alpha+alphaOffset, 0.0, 1.0);
 
     xloadcols();
     redraw();
