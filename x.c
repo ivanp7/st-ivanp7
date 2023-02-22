@@ -262,6 +262,7 @@ static char *opt_io    = NULL;
 static char *opt_line  = NULL;
 static char *opt_name  = NULL;
 static char *opt_title = NULL;
+static char *opt_dir   = NULL;
 
 static int focused = 0;
 
@@ -2131,12 +2132,12 @@ run(void)
 void
 usage(void)
 {
-	die("usage: %s [-aiv] [-c class] [-f font] [-g geometry]"
-	    " [-n name] [-o file]\n"
+	die("usage: %s [-aiv] [-c class] [-d path] [-f font]"
+	    " [-g geometry] [-n name] [-o file]\n"
 	    "          [-T title] [-t title] [-w windowid]"
 	    " [[-e] command [args ...]]\n"
-	    "       %s [-aiv] [-c class] [-f font] [-g geometry]"
-	    " [-n name] [-o file]\n"
+	    "       %s [-aiv] [-c class] [-d path] [-f font]"
+	    " [-g geometry] [-n name] [-o file]\n"
 	    "          [-T title] [-t title] [-w windowid] -l line"
 	    " [stty_args ...]\n", argv0, argv0);
 }
@@ -2196,6 +2197,9 @@ main(int argc, char *argv[])
 		if (!(defaultfontsize > 0))
 			usage();
 		break;
+	case 'd':
+		opt_dir = EARGF(usage());
+		break;
 	default:
 		usage();
 	} ARGEND;
@@ -2216,6 +2220,7 @@ run:
 	xinit(cols, rows);
 	xsetenv();
 	selinit();
+	chdir(opt_dir);
 	run();
 
 	return 0;
