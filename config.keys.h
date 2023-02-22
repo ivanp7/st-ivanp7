@@ -249,6 +249,8 @@ static Shortcut shortcuts[] = {
     DEF_FUNCTION( TERMMOD|ControlMask,  116 /*XK_Down*/,        zoom,           {.f = -1} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  113 /*XK_Left*/,        changealpha,    {.f = -0.05} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  114 /*XK_Right*/,       changealpha,    {.f = +0.05} ),
+    DEF_FUNCTION( TERMMOD|ControlMask,  59  /*XK_comma*/,       changealphaUnf, {.f = -0.05} ),
+    DEF_FUNCTION( TERMMOD|ControlMask,  60  /*XK_period*/,      changealphaUnf, {.f = +0.05} ),
 
     /* Input */
     DEF_FUNCTION( 0,                    108 /*XK_Alt_R*/,       switch_language, {} ),
