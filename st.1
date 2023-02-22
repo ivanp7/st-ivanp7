@@ -141,40 +141,58 @@ and all the remaining arguments are used as a command
 even without it.
 .SH SHORTCUTS
 .TP
+.B Alt-Ctrl-Left/Right or Mouse Wheel
+Scroll up/down one line at a time.
+.TP
+.B Alt-Ctrl-Up/Down
+Scroll up/down one screen at a time.
+.TP
+.B Alt-Shift-Ctrl-Up/Down
+Increase or decrease font size.
+.TP
+.B Alt-Home
+Reset to default font size.
+.TP
+.B Shift-Insert or Alt-Ctrl-v
+Paste from clipboard.
+.TP
+.B Alt-Ctrl-c
+Copy to clipboard.
+.TP
+.B Alt-Ctrl-p
+Paste/input primary selection.
+.TP
+.B Alt-Shift-Ctrl-Left/Right
+Increase or decrease window opacity/alpha value for the focused state.
+.TP
+.B Alt-Shift-Ctrl-</>
+Increase or decrease window opacity/alpha value for the unfocused state.
+.TP
 .B Break
 Send a break in the serial line.
 Break key is obtained in PC keyboards
 pressing at the same time control and pause.
 .TP
-.B Ctrl-Print Screen
+.B Ctrl-Scroll Lock
 Toggle if st should print to the
 .I iofile.
 .TP
-.B Shift-Print Screen
+.B Shift-Scroll Lock
 Print the full screen to the
 .I iofile.
 .TP
-.B Print Screen
+.B Scroll Lock
 Print the selection to the
 .I iofile.
 .TP
-.B Ctrl-Shift-Page Up
-Increase font size.
+.B Right Alt
+Switch system-independent keyboard language (English <-> Russian).
 .TP
-.B Ctrl-Shift-Page Down
-Decrease font size.
+.B Alt-Menu
+Switch system-independent keyboard layout (QWERTY <-> COLEMAK).
 .TP
-.B Ctrl-Shift-Home
-Reset to default font size.
-.TP
-.B Ctrl-Shift-y
-Paste from primary selection (middle mouse button).
-.TP
-.B Ctrl-Shift-c
-Copy the selected text to the clipboard selection.
-.TP
-.B Ctrl-Shift-v
-Paste from the clipboard selection.
+.B Alt-<letters>
+Emulate typing of digits and non-alphanumeric characters.
 .SH CUSTOMIZATION
 .B st
 can be customized by creating a custom config.h and (re)compiling the source
