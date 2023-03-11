@@ -155,27 +155,27 @@ static const char *colorname[] = {
     /* "black", /1* default background colour *1/ */
 
     /* special colors */
-    [256] = "#add8e6", /* cursor */
-    [257] = "#555555", /* reverse cursor */
+    [256] = "#dedede", /* foreground */
+    [257] = "#2b2b2b", /* background, focused */
+    [258] = "#2b2b36", /* background, unfocused */
 
-    [258] = "#dedede", /* foreground */
-    [259] = "#2b2b2b", /* background */
-
-    [260] = "#0ef096", /* cursor, alternative layout */
-    [261] = "#ffc7d5", /* cursor, alternative language */
+    [259] = "#add8e6", /* cursor */
+    [260] = "#555555", /* reverse cursor */
+    [261] = "#0ef096", /* cursor, alternative layout */
+    [262] = "#ffc7d5", /* cursor, alternative language */
 };
-
 
 /*
  * Default colors (colorname index)
  * foreground, background, cursor, reverse cursor
  */
-unsigned int defaultfg = 258;
-unsigned int defaultbg = 259;
-unsigned int defaultcs = 256;
-static unsigned int defaultrcs = 257;
-static unsigned int defaultcs_mode[] = {256, 260, 261};
-unsigned int bg = 259, bgUnfocused = 259;
+unsigned int defaultfg = 256;
+unsigned int defaultbg = 257;
+unsigned int bg = 257, bgUnfocused = 258;
+
+unsigned int defaultcs = 259;
+static unsigned int defaultrcs = 260;
+static unsigned int defaultcs_mode[] = {259, 261, 262};
 
 /*
  * Default shape of cursor
@@ -234,12 +234,13 @@ ResourcePref resources[] = {
     { "color13",        STRING,     &colorname[13] },
     { "color14",        STRING,     &colorname[14] },
     { "color15",        STRING,     &colorname[15] },
-    { "foreground",     STRING,     &colorname[258] },
-    { "background",     STRING,     &colorname[259] },
-    { "cursorColor",    STRING,     &colorname[256] },
-    { "revCursorColor", STRING,     &colorname[257] },
-    { "altLayoutCursorColor",   STRING,     &colorname[260] },
-    { "altLanguageCursorColor", STRING,     &colorname[261] },
+    { "foreground",     STRING,     &colorname[256] },
+    { "background",     STRING,     &colorname[257] },
+    { "backgroundUnfocused",    STRING,     &colorname[258] },
+    { "cursorColor",    STRING,     &colorname[259] },
+    { "revCursorColor", STRING,     &colorname[260] },
+    { "altLayoutCursorColor",   STRING,     &colorname[261] },
+    { "altLanguageCursorColor", STRING,     &colorname[262] },
     { "termname",       STRING,     &termname },
     { "shell",          STRING,     &shell },
     { "minlatency",     INTEGER,    &minlatency },
