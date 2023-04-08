@@ -223,6 +223,28 @@ write_var_arg(const Arg *arg)
 
 /******************************************************************************/
 
+static void
+changefontsize(const Arg *arg)
+{
+    static const int num_font_sizes = sizeof(font_sizes) / sizeof(font_sizes[0]);
+    static int font_size_idx = DEFAULT_FONT_SIZE_IDX;
+
+    if (arg->i != 0)
+        font_size_idx += arg->i;
+    else
+        font_size_idx = DEFAULT_FONT_SIZE_IDX;
+
+    if (font_size_idx < 0)
+        font_size_idx = 0;
+    else if (font_size_idx >= num_font_sizes)
+        font_size_idx = num_font_sizes - 1;
+
+    Arg newarg = {.f = font_sizes[font_size_idx]};
+    zoomabs(&newarg);
+}
+
+/******************************************************************************/
+
 #define DEF_FUNCTION(mod, keycode, fun, arg) \
     { mod, keycode, fun, arg }, \
     { mod|LockMask, keycode, fun, arg }
@@ -244,9 +266,9 @@ static Shortcut shortcuts[] = {
     DEF_FUNCTION( MODKEY|ControlMask,   113 /*XK_Left*/,        kscrollup,      {.i = -1} ),
     DEF_FUNCTION( MODKEY|ControlMask,   114 /*XK_Right*/,       kscrolldown,    {.i = -1} ),
 
-    DEF_FUNCTION( MODKEY,               110 /*XK_Home*/,        zoomreset,      {.f =  0} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,  111 /*XK_Up*/,          zoom,           {.f = +1} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,  116 /*XK_Down*/,        zoom,           {.f = -1} ),
+    DEF_FUNCTION( MODKEY,               110 /*XK_Home*/,        changefontsize, {.i =  0} ),
+    DEF_FUNCTION( TERMMOD|ControlMask,  111 /*XK_Up*/,          changefontsize, {.i = +1} ),
+    DEF_FUNCTION( TERMMOD|ControlMask,  116 /*XK_Down*/,        changefontsize, {.i = -1} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  113 /*XK_Left*/,        changealpha,    {.f = -0.05} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  114 /*XK_Right*/,       changealpha,    {.f = +0.05} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  59  /*XK_comma*/,       changealphaOffset, {.f = -0.05} ),

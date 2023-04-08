@@ -6,6 +6,8 @@
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
 static char *font = "xos4 Terminus:pixelsize=12:antialias=true:autohint=true";
+static const float font_sizes[] = {12.0, 14.0, 16.0, 18.0, 20.0, 22.0, 24.0, 28.0, 32.0};
+#define DEFAULT_FONT_SIZE_IDX 0
 static int borderpx = 2;
 
 /*
