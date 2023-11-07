@@ -156,8 +156,8 @@ write_selfinsert_char_arg_ctrl(const Arg *arg)
 /******************************************************************************/
 
 #define DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(mod, keycode) \
-    { mod,                    keycode, write_selfinsert_char_arg,       {.i = keycode} }, \
-    { mod|ShiftMask,          keycode, write_selfinsert_char_arg_shift, {.i = keycode} }
+    { mod,           keycode, write_selfinsert_char_arg,       {.i = keycode} }, \
+    { mod|ShiftMask, keycode, write_selfinsert_char_arg_shift, {.i = keycode} }
 
 #define DEF_SELFINSERT_KEY_NOCTRL(keycode) \
     DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(0,        keycode), \
@@ -176,8 +176,8 @@ write_selfinsert_char_arg_ctrl(const Arg *arg)
 /******************************************************************************/
 
 #define DEF_SELFINSERT_KEY_NOLOCK(mod, keycode) \
-    { mod,                    keycode, write_selfinsert_char_arg,       {.i = keycode} }, \
-    { mod|ShiftMask,          keycode, write_selfinsert_char_arg_shift, {.i = keycode} }, \
+    { mod,                       keycode, write_selfinsert_char_arg,       {.i = keycode} }, \
+    { mod|ShiftMask,             keycode, write_selfinsert_char_arg_shift, {.i = keycode} }, \
     { mod|ControlMask,           keycode, write_selfinsert_char_arg_ctrl,  {.i = keycode} }, \
     { mod|ControlMask|ShiftMask, keycode, write_selfinsert_char_arg_ctrl,  {.i = keycode} }
 
@@ -246,20 +246,20 @@ changefontsize(const Arg *arg)
 /******************************************************************************/
 
 #define DEF_FUNCTION(mod, keycode, fun, arg) \
-    { mod, keycode, fun, arg }, \
+    { mod,          keycode, fun, arg }, \
     { mod|LockMask, keycode, fun, arg }
 
 static Shortcut shortcuts[] = {
     /*            mask                  keycode                 function        argument */
     DEF_FUNCTION( XK_ANY_MOD,           127 /*XK_Break*/,       sendbreak,      {.i =  0} ),
-    DEF_FUNCTION( ControlMask,          78 /*XK_Scroll_Lock*/,  toggleprinter,  {.i =  0} ),
-    DEF_FUNCTION( ShiftMask,            78 /*XK_Scroll_Lock*/,  printscreen,    {.i =  0} ),
-    DEF_FUNCTION( XK_ANY_MOD,           78 /*XK_Scroll_Lock*/,  printsel,       {.i =  0} ),
+    DEF_FUNCTION( ControlMask,           78 /*XK_Scroll_Lock*/, toggleprinter,  {.i =  0} ),
+    DEF_FUNCTION( ShiftMask,             78 /*XK_Scroll_Lock*/, printscreen,    {.i =  0} ),
+    DEF_FUNCTION( XK_ANY_MOD,            78 /*XK_Scroll_Lock*/, printsel,       {.i =  0} ),
 
     DEF_FUNCTION( ShiftMask,            118 /*XK_Insert*/,      clippaste,      {.i =  0} ),
-    DEF_FUNCTION( MODKEY|ControlMask,   54 /*XK_c*/,            clipcopy,       {.i =  0} ),
-    DEF_FUNCTION( MODKEY|ControlMask,   55 /*XK_v*/,            clippaste,      {.i =  0} ),
-    DEF_FUNCTION( MODKEY|ControlMask,   33 /*XK_p*/,            selpaste,       {.i =  0} ),
+    DEF_FUNCTION( MODKEY|ControlMask,    54 /*XK_c*/,           clipcopy,       {.i =  0} ),
+    DEF_FUNCTION( MODKEY|ControlMask,    55 /*XK_v*/,           clippaste,      {.i =  0} ),
+    DEF_FUNCTION( MODKEY|ControlMask,    33 /*XK_p*/,           selpaste,       {.i =  0} ),
 
     DEF_FUNCTION( MODKEY|ControlMask,   111 /*XK_Up*/,          kscrollup,      {.i = +10} ),
     DEF_FUNCTION( MODKEY|ControlMask,   116 /*XK_Down*/,        kscrolldown,    {.i = +10} ),
@@ -271,12 +271,17 @@ static Shortcut shortcuts[] = {
     DEF_FUNCTION( TERMMOD|ControlMask,  116 /*XK_Down*/,        changefontsize, {.i = -1} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  113 /*XK_Left*/,        changealpha,    {.f = -0.05} ),
     DEF_FUNCTION( TERMMOD|ControlMask,  114 /*XK_Right*/,       changealpha,    {.f = +0.05} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,  59  /*XK_comma*/,       changealphaOffset, {.f = -0.05} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,  60  /*XK_period*/,      changealphaOffset, {.f = +0.05} ),
+    DEF_FUNCTION( TERMMOD|ControlMask,   59 /*XK_comma*/,       changealphaOffset, {.f = -0.05} ),
+    DEF_FUNCTION( TERMMOD|ControlMask,   60 /*XK_period*/,      changealphaOffset, {.f = +0.05} ),
 
     /* Input */
     DEF_FUNCTION( 0,                    108 /*XK_Alt_R*/,       switch_language, {} ),
-    DEF_FUNCTION( MODKEY,               135  /*XK_Menu*/,       switch_layout, {} ),
+    DEF_FUNCTION( MODKEY,               135 /*XK_Menu*/,        switch_layout,   {} ),
+
+    // Tab
+    DEF_FUNCTION( MODKEY,                23 /*XK_Tab*/,         write_char_arg,  {.s = "\t"} ),
+    // Space
+    DEF_SELFINSERT_KEY_NOCTRL(65),
 
     // digit row
     DEF_SELFINSERT_KEY_WITH_ALT(10, "1", "!"), // 1
@@ -294,7 +299,6 @@ static Shortcut shortcuts[] = {
     DEF_SELFINSERT_KEY(22), // Backspace
 
     // top row
-    DEF_SELFINSERT_KEY(23), // Tab
     DEF_SELFINSERT_KEY_WITH_ALT(24, "`", "~"), // q
     DEF_VARINSERT_KEY_WITH_ALT(25, "ST_W0", "ST_W1"), // w
     DEF_VARINSERT_KEY_WITH_ALT(26, "ST_E0", "ST_E1"), // e
@@ -334,8 +338,5 @@ static Shortcut shortcuts[] = {
     DEF_SELFINSERT_KEY_WITH_ALT(59, ",", "<"), // ,
     DEF_SELFINSERT_KEY_WITH_ALT(60, ".", ">"), // .
     DEF_SELFINSERT_KEY_WITH_ALT(61, "/", "?"), // Slash
-
-    // space
-    DEF_SELFINSERT_KEY_NOCTRL(65), // Space
 };
 
