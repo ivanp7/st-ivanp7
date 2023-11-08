@@ -160,18 +160,13 @@ write_selfinsert_char_arg_ctrl(const Arg *arg)
     { mod|ShiftMask, keycode, write_selfinsert_char_arg_shift, {.i = keycode} }
 
 #define DEF_SELFINSERT_KEY_NOCTRL(keycode) \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(0,        keycode), \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(LockMask, keycode), \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(MODKEY,          keycode), \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(MODKEY|LockMask, keycode)
+    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(0,      keycode), \
+    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(MODKEY, keycode)
 
 #define DEF_SELFINSERT_KEY_NOCTRL_WITH_ALT(keycode, alt_chr, alt_shift_chr) \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(0,        keycode), \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(LockMask, keycode), \
-    { MODKEY,                    keycode, write_char_arg, {.s = alt_chr} }, \
-    { MODKEY|LockMask,           keycode, write_char_arg, {.s = alt_chr} }, \
-    { MODKEY|ShiftMask,          keycode, write_char_arg, {.s = alt_shift_chr} }, \
-    { MODKEY|ShiftMask|LockMask, keycode, write_char_arg, {.s = alt_shift_chr} }
+    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(0, keycode), \
+    { MODKEY,           keycode, write_char_arg, {.s = alt_chr} }, \
+    { MODKEY|ShiftMask, keycode, write_char_arg, {.s = alt_shift_chr} }
 
 /******************************************************************************/
 
@@ -182,18 +177,13 @@ write_selfinsert_char_arg_ctrl(const Arg *arg)
     { mod|ControlMask|ShiftMask, keycode, write_selfinsert_char_arg_ctrl,  {.i = keycode} }
 
 #define DEF_SELFINSERT_KEY(keycode) \
-    DEF_SELFINSERT_KEY_NOLOCK(0,        keycode), \
-    DEF_SELFINSERT_KEY_NOLOCK(LockMask, keycode), \
-    DEF_SELFINSERT_KEY_NOLOCK(MODKEY,          keycode), \
-    DEF_SELFINSERT_KEY_NOLOCK(MODKEY|LockMask, keycode)
+    DEF_SELFINSERT_KEY_NOLOCK(0,      keycode), \
+    DEF_SELFINSERT_KEY_NOLOCK(MODKEY, keycode)
 
 #define DEF_SELFINSERT_KEY_WITH_ALT(keycode, alt_chr, alt_shift_chr) \
-    DEF_SELFINSERT_KEY_NOLOCK(0,        keycode), \
-    DEF_SELFINSERT_KEY_NOLOCK(LockMask, keycode), \
-    { MODKEY,                    keycode, write_char_arg, {.s = alt_chr} }, \
-    { MODKEY|LockMask,           keycode, write_char_arg, {.s = alt_chr} }, \
-    { MODKEY|ShiftMask,          keycode, write_char_arg, {.s = alt_shift_chr} }, \
-    { MODKEY|ShiftMask|LockMask, keycode, write_char_arg, {.s = alt_shift_chr} }
+    DEF_SELFINSERT_KEY_NOLOCK(0, keycode), \
+    { MODKEY,           keycode, write_char_arg, {.s = alt_chr} }, \
+    { MODKEY|ShiftMask, keycode, write_char_arg, {.s = alt_shift_chr} }
 
 /******************************************************************************/
 
@@ -214,12 +204,9 @@ write_var_arg(const Arg *arg)
 /******************************************************************************/
 
 #define DEF_VARINSERT_KEY_WITH_ALT(keycode, var, shift_var) \
-    DEF_SELFINSERT_KEY_NOLOCK(0,        keycode), \
-    DEF_SELFINSERT_KEY_NOLOCK(LockMask, keycode), \
-    { MODKEY,                    keycode, write_var_arg, {.s = var} }, \
-    { MODKEY|LockMask,           keycode, write_var_arg, {.s = var} }, \
-    { MODKEY|ShiftMask,          keycode, write_var_arg, {.s = shift_var} }, \
-    { MODKEY|ShiftMask|LockMask, keycode, write_var_arg, {.s = shift_var} }
+    DEF_SELFINSERT_KEY_NOLOCK(0, keycode), \
+    { MODKEY,           keycode, write_var_arg, {.s = var} }, \
+    { MODKEY|ShiftMask, keycode, write_var_arg, {.s = shift_var} }
 
 /******************************************************************************/
 
@@ -246,8 +233,7 @@ changefontsize(const Arg *arg)
 /******************************************************************************/
 
 #define DEF_FUNCTION(mod, keycode, fun, arg) \
-    { mod,          keycode, fun, arg }, \
-    { mod|LockMask, keycode, fun, arg }
+    { mod, keycode, fun, arg }
 
 static Shortcut shortcuts[] = {
     /*            mask                  keycode                 function        argument */
