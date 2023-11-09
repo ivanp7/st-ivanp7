@@ -1,7 +1,108 @@
+static int keyboard_language = 0;
+static int keyboard_english_layout = 0;
+
+/**********************/
+/* 9 <= keycode <= 22 */
+static char *keyboard_digit_row[2] = {
+    "\x1B""1234567890-=\b", "\x1B""!@#$%^&*()_+\b"
+};
+static char *keyboard_digit_row_ctrl = "\x1B""1\x00\x1B\x1C\x1D\x1E\x1F\x7F""90-=\x08";
+
+/***********************/
+/* 23 <= keycode <= 35 */
+static char *keyboard_top_rows[3][2] = {
+    { "\tqwertyuiop[]", "\tQWERTYUIOP{}" },
+    { "\tqwfpgjluy;[]", "\tQWFPGJLUY:{}" },
+    { "\tйцукенгшщзхъ", "\tЙЦУКЕНГШЩЗХЪ" }
+};
+static char **keyboard_top_row = keyboard_top_rows[0];
+
+static char *keyboard_top_rows_ctrl[2] = {
+    "\x09\x11\x17\x05\x12\x14\x19\x15\x09\x0F\x10\x1B\x1D",
+    "\x09\x11\x17\x06\x10\x07\x0A\x0C\x15\x19;\x1B\x1D"
+};
+
+/***********************/
+/* 38 <= keycode <= 49 */
+static char *keyboard_middle_rows[3][2] = {
+    { "asdfghjkl;'`", "ASDFGHJKL:\"~" },
+    { "arstdhneio'`", "ARSTDHNEIO\"~" },
+    { "фывапролджэё", "ФЫВАПРОЛДЖЭЁ" }
+};
+static char **keyboard_middle_row = keyboard_middle_rows[0];
+
+static char *keyboard_middle_rows_ctrl[2] = {
+    "\x01\x13\x04\x06\x07\x08\x0A\x0B\x0C;'`",
+    "\x01\x12\x13\x14\x04\x08\x0E\x05\x09\x0F'`"
+};
+
+/***********************/
+/* 51 <= keycode <= 61 */
+static char *keyboard_bottom_rows[3][2] = {
+    { "\\zxcvbnm,./", "|ZXCVBNM<>?" },
+    { "\\zxcvbkm,./", "|ZXCVBKM<>?" },
+    { "\\ячсмитьбю/", "|ЯЧСМИТЬБЮ?" }
+};
+static char **keyboard_bottom_row = keyboard_bottom_rows[0];
+
+static char *keyboard_bottom_rows_ctrl[2] = {
+    "\x1C\x1A\x18\x03\x16\x02\x0E\x0D,.\x1F",
+    "\x1C\x1A\x18\x03\x16\x02\x0B\x0D,.\x1F"
+};
+
+/*****************/
+/* keycode == 65 */
+static char *keyboard_space = " ";
+
+/******************************************************************************/
+
+static void
+switch_language(const Arg *arg)
+{
+    keyboard_language = 1 - keyboard_language;
+
+    if (keyboard_language == 0)
+    {
+        keyboard_top_row = keyboard_top_rows[keyboard_english_layout];
+        keyboard_middle_row = keyboard_middle_rows[keyboard_english_layout];
+        keyboard_bottom_row = keyboard_bottom_rows[keyboard_english_layout];
+
+        defaultcs = defaultcs_mode[keyboard_english_layout];
+        redraw(); // cursor
+    }
+    else
+    {
+        keyboard_top_row = keyboard_top_rows[2];
+        keyboard_middle_row = keyboard_middle_rows[2];
+        keyboard_bottom_row = keyboard_bottom_rows[2];
+
+        defaultcs = defaultcs_mode[2];
+        redraw(); // cursor
+    }
+}
+
+static void
+switch_layout(const Arg *arg)
+{
+    keyboard_english_layout = 1 - keyboard_english_layout;
+
+    if (keyboard_language == 0)
+    {
+        keyboard_top_row = keyboard_top_rows[keyboard_english_layout];
+        keyboard_middle_row = keyboard_middle_rows[keyboard_english_layout];
+        keyboard_bottom_row = keyboard_bottom_rows[keyboard_english_layout];
+
+        defaultcs = defaultcs_mode[keyboard_english_layout];
+        redraw(); // cursor
+    }
+}
+
+/******************************************************************************/
+
 static size_t
 char_length(char signed_c)
 {
-    unsigned char c = (unsigned char)signed_c;
+    unsigned char c = signed_c;
     if (c >> 7 == 0x0)
         return 1;
     else if (c >> 5 == 0x6)
@@ -26,6 +127,7 @@ write_char(const char *chrs, int skip)
         chrs += char_length(*chrs);
         skip--;
     }
+
     ttywrite(chrs, char_length(*chrs), 1);
 }
 
@@ -37,92 +139,29 @@ write_char_arg(const Arg *arg)
 
 /******************************************************************************/
 
-static int layout = 0; // 0 -- qwerty, 1 -- colemak
-static int language = 0; // 0 -- english, 1 -- russian
-
 static void
-update_cursor()
+insert_key(int keycode, int shift)
 {
-    if (language == 0)
-        defaultcs = defaultcs_mode[layout];
-    else
-        defaultcs = defaultcs_mode[2];
-    redraw();
-}
-
-static void
-switch_language(const Arg *arg)
-{
-    language = 1 - language;
-    update_cursor();
-}
-
-static void
-switch_layout(const Arg *arg)
-{
-    layout = 1 - layout;
-    update_cursor();
-}
-
-/******************************************************************************/
-
-static char *keyboard_digit_row[3] = { /* 9 <= keycode <= 22 */
-    "\x1B""1234567890-=\b", "\x1B!@#$%^&*()_+\b", "\x1B""1\x00\x1B\x1C\x1D\x1E\x1F\x7F""90-=\x08"
-};
-
-static char *keyboard_top_row[3][3] = { /* 23 <= keycode <= 35 */
-    { "\tqwertyuiop[]", "\tQWERTYUIOP{}", "\t\x11\x17\x05\x12\x14\x19\x15\x09\x0F\x10\x1B\x1D" },
-    { "\tqwfpgjluy;[]", "\tQWFPGJLUY:{}", "\t\x11\x17\x06\x10\x07\x0A\x0C\x15\x19;\x1B\x1D" },
-    { "\tйцукенгшщзхъ", "\tЙЦУКЕНГШЩЗХЪ", "" }
-};
-
-static char *keyboard_middle_row[3][3] = { /* 38 <= keycode <= 49 */
-    { "asdfghjkl;'`", "ASDFGHJKL:\"~", "\x01\x13\x04\x06\x07\x08\x0A\x0B\x0C;'`" },
-    { "arstdhneio'`", "ARSTDHNEIO\"~", "\x01\x12\x13\x14\x04\x08\x0E\x05\x09\x0F'`" },
-    { "фывапролджэё", "ФЫВАПРОЛДЖЭЁ", "" }
-};
-
-static char *keyboard_bottom_row[3][3] = { /* 51 <= keycode <= 61 */
-    { "\\zxcvbnm,./", "|ZXCVBNM<>?", "\x1C\x1A\x18\x03\x16\x02\x0E\x0D,.\x1F" },
-    { "\\zxcvbkm,./", "|ZXCVBKM<>?", "\x1C\x1A\x18\x03\x16\x02\x0B\x0D,.\x1F" },
-    { "\\ячсмитьбю/", "|ЯЧСМИТЬБЮ?", "" }
-};
-
-static char *keyboard_space = " ";
-
-static void
-write_selfinsert_char(int keycode, int index)
-{
-    int mode;
-    if (index < 2)
-    {
-        if (language == 0)
-            mode = layout;
-        else
-            mode = 2;
-    }
-    else
-        mode = layout;
-
     char *chrs;
+
     if ((9 <= keycode) && (keycode <= 22))
     {
-        chrs = keyboard_digit_row[index];
+        chrs = keyboard_digit_row[shift];
         keycode -= 9;
     }
     else if ((23 <= keycode) && (keycode <= 35))
     {
-        chrs = keyboard_top_row[mode][index];
+        chrs = keyboard_top_row[shift];
         keycode -= 23;
     }
     else if ((38 <= keycode) && (keycode <= 49))
     {
-        chrs = keyboard_middle_row[mode][index];
+        chrs = keyboard_middle_row[shift];
         keycode -= 38;
     }
     else if ((51 <= keycode) && (keycode <= 61))
     {
-        chrs = keyboard_bottom_row[mode][index];
+        chrs = keyboard_bottom_row[shift];
         keycode -= 51;
     }
     else if (keycode == 65)
@@ -132,58 +171,58 @@ write_selfinsert_char(int keycode, int index)
     }
     else
         return;
+
     write_char(chrs, keycode);
 }
 
 static void
-write_selfinsert_char_arg(const Arg *arg)
+insert_key_ctrl(int keycode)
 {
-    write_selfinsert_char(arg->i, 0);
+    char *chrs;
+
+    if ((9 <= keycode) && (keycode <= 22))
+    {
+        chrs = keyboard_digit_row_ctrl;
+        keycode -= 9;
+    }
+    else if ((23 <= keycode) && (keycode <= 35))
+    {
+        chrs = keyboard_top_rows_ctrl[keyboard_english_layout];
+        keycode -= 23;
+    }
+    else if ((38 <= keycode) && (keycode <= 49))
+    {
+        chrs = keyboard_middle_rows_ctrl[keyboard_english_layout];
+        keycode -= 38;
+    }
+    else if ((51 <= keycode) && (keycode <= 61))
+    {
+        chrs = keyboard_bottom_rows_ctrl[keyboard_english_layout];
+        keycode -= 51;
+    }
+    else
+        return;
+
+    write_char(chrs, keycode);
 }
 
 static void
-write_selfinsert_char_arg_shift(const Arg *arg)
+insert_key_arg(const Arg *arg)
 {
-    write_selfinsert_char(arg->i, 1);
+    insert_key(arg->i, 0);
 }
 
 static void
-write_selfinsert_char_arg_ctrl(const Arg *arg)
+insert_key_shift_arg(const Arg *arg)
 {
-    write_selfinsert_char(arg->i, 2);
+    insert_key(arg->i, 1);
 }
 
-/******************************************************************************/
-
-#define DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(mod, keycode) \
-    { mod,           keycode, write_selfinsert_char_arg,       {.i = keycode} }, \
-    { mod|ShiftMask, keycode, write_selfinsert_char_arg_shift, {.i = keycode} }
-
-#define DEF_SELFINSERT_KEY_NOCTRL(keycode) \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(0,      keycode), \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(MODKEY, keycode)
-
-#define DEF_SELFINSERT_KEY_NOCTRL_WITH_ALT(keycode, alt_chr, alt_shift_chr) \
-    DEF_SELFINSERT_KEY_NOCTRL_NOLOCK(0, keycode), \
-    { MODKEY,           keycode, write_char_arg, {.s = alt_chr} }, \
-    { MODKEY|ShiftMask, keycode, write_char_arg, {.s = alt_shift_chr} }
-
-/******************************************************************************/
-
-#define DEF_SELFINSERT_KEY_NOLOCK(mod, keycode) \
-    { mod,                       keycode, write_selfinsert_char_arg,       {.i = keycode} }, \
-    { mod|ShiftMask,             keycode, write_selfinsert_char_arg_shift, {.i = keycode} }, \
-    { mod|ControlMask,           keycode, write_selfinsert_char_arg_ctrl,  {.i = keycode} }, \
-    { mod|ControlMask|ShiftMask, keycode, write_selfinsert_char_arg_ctrl,  {.i = keycode} }
-
-#define DEF_SELFINSERT_KEY(keycode) \
-    DEF_SELFINSERT_KEY_NOLOCK(0,      keycode), \
-    DEF_SELFINSERT_KEY_NOLOCK(MODKEY, keycode)
-
-#define DEF_SELFINSERT_KEY_WITH_ALT(keycode, alt_chr, alt_shift_chr) \
-    DEF_SELFINSERT_KEY_NOLOCK(0, keycode), \
-    { MODKEY,           keycode, write_char_arg, {.s = alt_chr} }, \
-    { MODKEY|ShiftMask, keycode, write_char_arg, {.s = alt_shift_chr} }
+static void
+insert_key_ctrl_arg(const Arg *arg)
+{
+    insert_key_ctrl(arg->i);
+}
 
 /******************************************************************************/
 
@@ -200,13 +239,6 @@ write_var_arg(const Arg *arg)
         str += char_length(*str);
     }
 }
-
-/******************************************************************************/
-
-#define DEF_VARINSERT_KEY_WITH_ALT(keycode, var, shift_var) \
-    DEF_SELFINSERT_KEY_NOLOCK(0, keycode), \
-    { MODKEY,           keycode, write_var_arg, {.s = var} }, \
-    { MODKEY|ShiftMask, keycode, write_var_arg, {.s = shift_var} }
 
 /******************************************************************************/
 
@@ -232,97 +264,128 @@ changefontsize(const Arg *arg)
 
 /******************************************************************************/
 
-#define DEF_FUNCTION(mod, keycode, fun, arg) \
-    { mod, keycode, fun, arg }
+#define KEY_INSERT_0(keycode) \
+    { XK_NO_MOD, keycode, insert_key_arg,       {.i = keycode} }
+
+#define KEY_INSERT_0S(keycode) \
+    { XK_NO_MOD, keycode, insert_key_arg,       {.i = keycode} }, \
+    { ShiftMask, keycode, insert_key_shift_arg, {.i = keycode} }
+
+#define KEY_INSERT_0SC(keycode) \
+    KEY_INSERT_0S(keycode), \
+    { ControlMask,           keycode, insert_key_ctrl_arg,  {.i = keycode} }, \
+    { ControlMask|ShiftMask, keycode, insert_key_ctrl_arg,  {.i = keycode} }
+
+/******************************************************************************/
+
+#define KEY_INSERT_0_ALT_CHR(keycode, alt_chr) \
+    KEY_INSERT_0(keycode), \
+    { MODKEY, keycode, write_char_arg, {.s = alt_chr} }
+
+#define KEY_INSERT_0S_ALT_CHR(keycode, alt_chr, alt_shift_chr) \
+    KEY_INSERT_0S(keycode), \
+    { MODKEY,           keycode, write_char_arg, {.s = alt_chr} }, \
+    { MODKEY|ShiftMask, keycode, write_char_arg, {.s = alt_shift_chr} }
+
+#define KEY_INSERT_0SC_ALT_CHR(keycode, alt_chr, alt_shift_chr) \
+    KEY_INSERT_0SC(keycode), \
+    { MODKEY,           keycode, write_char_arg, {.s = alt_chr} }, \
+    { MODKEY|ShiftMask, keycode, write_char_arg, {.s = alt_shift_chr} }
+
+#define KEY_INSERT_0SC_ALT_ENV(keycode, var, shift_var) \
+    KEY_INSERT_0SC(keycode), \
+    { MODKEY,           keycode, write_var_arg, {.s = var} }, \
+    { MODKEY|ShiftMask, keycode, write_var_arg, {.s = shift_var} }
+
+/******************************************************************************/
 
 static Shortcut shortcuts[] = {
     /*            mask                  keycode                 function        argument */
-    DEF_FUNCTION( XK_ANY_MOD,           127 /*XK_Break*/,       sendbreak,      {.i =  0} ),
-    DEF_FUNCTION( ControlMask,           78 /*XK_Scroll_Lock*/, toggleprinter,  {.i =  0} ),
-    DEF_FUNCTION( ShiftMask,             78 /*XK_Scroll_Lock*/, printscreen,    {.i =  0} ),
-    DEF_FUNCTION( XK_ANY_MOD,            78 /*XK_Scroll_Lock*/, printsel,       {.i =  0} ),
+    { XK_ANY_MOD,           127 /*XK_Break*/,       sendbreak,      {.i =  0} },
+    { ControlMask,           78 /*XK_Scroll_Lock*/, toggleprinter,  {.i =  0} },
+    { ShiftMask,             78 /*XK_Scroll_Lock*/, printscreen,    {.i =  0} },
+    { XK_ANY_MOD,            78 /*XK_Scroll_Lock*/, printsel,       {.i =  0} },
 
-    DEF_FUNCTION( ShiftMask,            118 /*XK_Insert*/,      clippaste,      {.i =  0} ),
-    DEF_FUNCTION( MODKEY|ControlMask,    54 /*XK_c*/,           clipcopy,       {.i =  0} ),
-    DEF_FUNCTION( MODKEY|ControlMask,    55 /*XK_v*/,           clippaste,      {.i =  0} ),
-    DEF_FUNCTION( MODKEY|ControlMask,    33 /*XK_p*/,           selpaste,       {.i =  0} ),
+    { ShiftMask,            118 /*XK_Insert*/,      clippaste,      {.i =  0} },
+    { MODKEY|ControlMask,    54 /*XK_c*/,           clipcopy,       {.i =  0} },
+    { MODKEY|ControlMask,    55 /*XK_v*/,           clippaste,      {.i =  0} },
+    { MODKEY|ControlMask,    33 /*XK_p*/,           selpaste,       {.i =  0} },
 
-    DEF_FUNCTION( MODKEY|ControlMask,   111 /*XK_Up*/,          kscrollup,      {.i = +10} ),
-    DEF_FUNCTION( MODKEY|ControlMask,   116 /*XK_Down*/,        kscrolldown,    {.i = +10} ),
-    DEF_FUNCTION( MODKEY|ControlMask,   113 /*XK_Left*/,        kscrollup,      {.i = -1} ),
-    DEF_FUNCTION( MODKEY|ControlMask,   114 /*XK_Right*/,       kscrolldown,    {.i = -1} ),
+    { MODKEY|ControlMask,   111 /*XK_Up*/,          kscrollup,      {.i = +10} },
+    { MODKEY|ControlMask,   116 /*XK_Down*/,        kscrolldown,    {.i = +10} },
+    { MODKEY|ControlMask,   113 /*XK_Left*/,        kscrollup,      {.i = -1} },
+    { MODKEY|ControlMask,   114 /*XK_Right*/,       kscrolldown,    {.i = -1} },
 
-    DEF_FUNCTION( MODKEY,               110 /*XK_Home*/,        changefontsize, {.i =  0} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,  111 /*XK_Up*/,          changefontsize, {.i = +1} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,  116 /*XK_Down*/,        changefontsize, {.i = -1} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,  113 /*XK_Left*/,        changealpha,    {.f = -0.05} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,  114 /*XK_Right*/,       changealpha,    {.f = +0.05} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,   59 /*XK_comma*/,       changealphaOffset, {.f = -0.05} ),
-    DEF_FUNCTION( TERMMOD|ControlMask,   60 /*XK_period*/,      changealphaOffset, {.f = +0.05} ),
+    { MODKEY,               110 /*XK_Home*/,        changefontsize, {.i =  0} },
+    { TERMMOD|ControlMask,  111 /*XK_Up*/,          changefontsize, {.i = +1} },
+    { TERMMOD|ControlMask,  116 /*XK_Down*/,        changefontsize, {.i = -1} },
+    { TERMMOD|ControlMask,  113 /*XK_Left*/,        changealpha,    {.f = -0.05} },
+    { TERMMOD|ControlMask,  114 /*XK_Right*/,       changealpha,    {.f = +0.05} },
+    { TERMMOD|ControlMask,   59 /*XK_comma*/,       changealphaOffset, {.f = -0.05} },
+    { TERMMOD|ControlMask,   60 /*XK_period*/,      changealphaOffset, {.f = +0.05} },
 
     /* Input */
-    DEF_FUNCTION( 0,                    108 /*XK_Alt_R*/,       switch_language, {} ),
-    DEF_FUNCTION( MODKEY,               135 /*XK_Menu*/,        switch_layout,   {} ),
-
-    // Tab
-    DEF_FUNCTION( MODKEY,                23 /*XK_Tab*/,         write_char_arg,  {.s = "\t"} ),
-    // Space
-    DEF_SELFINSERT_KEY_NOCTRL(65),
+    { XK_NO_MOD,            108 /*XK_Alt_R*/,       switch_language, {0} },
+    { MODKEY,               135 /*XK_Menu*/,        switch_layout,   {0} },
 
     // digit row
-    DEF_SELFINSERT_KEY_WITH_ALT(10, "1", "!"), // 1
-    DEF_SELFINSERT_KEY_WITH_ALT(11, "2", "@"), // 2
-    DEF_SELFINSERT_KEY_WITH_ALT(12, "3", "#"), // 3
-    DEF_SELFINSERT_KEY_WITH_ALT(13, "4", "$"), // 4
-    DEF_SELFINSERT_KEY_WITH_ALT(14, "5", "%"), // 5
-    DEF_SELFINSERT_KEY_WITH_ALT(15, "6", "^"), // 6
-    DEF_SELFINSERT_KEY_WITH_ALT(16, "7", "&"), // 7
-    DEF_SELFINSERT_KEY_WITH_ALT(17, "8", "*"), // 8
-    DEF_SELFINSERT_KEY_WITH_ALT(18, "9", "("), // 9
-    DEF_SELFINSERT_KEY_WITH_ALT(19, "0", ")"), // 0
-    DEF_SELFINSERT_KEY_WITH_ALT(20, "-", "_"), // -
-    DEF_SELFINSERT_KEY_WITH_ALT(21, "=", "+"), // =
-    DEF_SELFINSERT_KEY(22), // Backspace
+    KEY_INSERT_0SC_ALT_CHR(10, "1", "!"), // 1
+    KEY_INSERT_0SC_ALT_CHR(11, "2", "@"), // 2
+    KEY_INSERT_0SC_ALT_CHR(12, "3", "#"), // 3
+    KEY_INSERT_0SC_ALT_CHR(13, "4", "$"), // 4
+    KEY_INSERT_0SC_ALT_CHR(14, "5", "%"), // 5
+    KEY_INSERT_0SC_ALT_CHR(15, "6", "^"), // 6
+    KEY_INSERT_0SC_ALT_CHR(16, "7", "&"), // 7
+    KEY_INSERT_0SC_ALT_CHR(17, "8", "*"), // 8
+    KEY_INSERT_0SC_ALT_CHR(18, "9", "("), // 9
+    KEY_INSERT_0SC_ALT_CHR(19, "0", ")"), // 0
+    KEY_INSERT_0SC_ALT_CHR(20, "-", "_"), // -
+    KEY_INSERT_0SC_ALT_CHR(21, "=", "+"), // =
+    KEY_INSERT_0S_ALT_CHR(22, "\b", "\b"), // Backspace
 
     // top row
-    DEF_SELFINSERT_KEY_WITH_ALT(24, "`", "~"), // q
-    DEF_VARINSERT_KEY_WITH_ALT(25, "ST_W0", "ST_W1"), // w
-    DEF_VARINSERT_KEY_WITH_ALT(26, "ST_E0", "ST_E1"), // e
-    DEF_VARINSERT_KEY_WITH_ALT(27, "ST_R0", "ST_R1"), // r
-    DEF_VARINSERT_KEY_WITH_ALT(28, "ST_T0", "ST_T1"), // t
-    DEF_VARINSERT_KEY_WITH_ALT(29, "ST_Y0", "ST_Y1"), // y
-    DEF_SELFINSERT_KEY_WITH_ALT(30, "\\", "|"), // u
-    DEF_SELFINSERT_KEY_WITH_ALT(31, "-", "_"), // i
-    DEF_SELFINSERT_KEY_WITH_ALT(32, "=", "+"), // o
-    DEF_SELFINSERT_KEY_WITH_ALT(33, ";", ":"), // p
-    DEF_SELFINSERT_KEY_WITH_ALT(34, "[", "{"), // [
-    DEF_SELFINSERT_KEY_WITH_ALT(35, "]", "}"), // ]
+    KEY_INSERT_0_ALT_CHR(23, "\t"), // Tab
+    KEY_INSERT_0SC_ALT_CHR(24, "`", "~"), // q
+    KEY_INSERT_0SC_ALT_ENV(25, "ST_W0", "ST_W1"), // w
+    KEY_INSERT_0SC_ALT_ENV(26, "ST_E0", "ST_E1"), // e
+    KEY_INSERT_0SC_ALT_ENV(27, "ST_R0", "ST_R1"), // r
+    KEY_INSERT_0SC_ALT_ENV(28, "ST_T0", "ST_T1"), // t
+    KEY_INSERT_0SC_ALT_ENV(29, "ST_Y0", "ST_Y1"), // y
+    KEY_INSERT_0SC_ALT_CHR(30, "\\", "|"), // u
+    KEY_INSERT_0SC_ALT_CHR(31, "-", "_"), // i
+    KEY_INSERT_0SC_ALT_CHR(32, "=", "+"), // o
+    KEY_INSERT_0SC_ALT_CHR(33, ";", ":"), // p
+    KEY_INSERT_0SC_ALT_CHR(34, "[", "{"), // [
+    KEY_INSERT_0SC_ALT_CHR(35, "]", "}"), // ]
 
     // middle row
-    DEF_SELFINSERT_KEY_WITH_ALT(38, "1", "!"), // a
-    DEF_SELFINSERT_KEY_WITH_ALT(39, "2", "@"), // s
-    DEF_SELFINSERT_KEY_WITH_ALT(40, "3", "#"), // d
-    DEF_SELFINSERT_KEY_WITH_ALT(41, "4", "$"), // f
-    DEF_SELFINSERT_KEY_WITH_ALT(42, "5", "%"), // g
-    DEF_SELFINSERT_KEY_WITH_ALT(43, "6", "^"), // h
-    DEF_SELFINSERT_KEY_WITH_ALT(44, "7", "&"), // j
-    DEF_SELFINSERT_KEY_WITH_ALT(45, "8", "*"), // k
-    DEF_SELFINSERT_KEY_WITH_ALT(46, "9", "("), // l
-    DEF_SELFINSERT_KEY_WITH_ALT(47, "0", ")"), // ;
-    DEF_SELFINSERT_KEY_WITH_ALT(48, "'", "\""), // '
-    DEF_SELFINSERT_KEY_WITH_ALT(49, "`", "~"), // Tilde
+    KEY_INSERT_0SC_ALT_CHR(38, "1", "!"), // a
+    KEY_INSERT_0SC_ALT_CHR(39, "2", "@"), // s
+    KEY_INSERT_0SC_ALT_CHR(40, "3", "#"), // d
+    KEY_INSERT_0SC_ALT_CHR(41, "4", "$"), // f
+    KEY_INSERT_0SC_ALT_CHR(42, "5", "%"), // g
+    KEY_INSERT_0SC_ALT_CHR(43, "6", "^"), // h
+    KEY_INSERT_0SC_ALT_CHR(44, "7", "&"), // j
+    KEY_INSERT_0SC_ALT_CHR(45, "8", "*"), // k
+    KEY_INSERT_0SC_ALT_CHR(46, "9", "("), // l
+    KEY_INSERT_0SC_ALT_CHR(47, "0", ")"), // ;
+    KEY_INSERT_0SC_ALT_CHR(48, "'", "\""), // '
+    KEY_INSERT_0SC_ALT_CHR(49, "`", "~"), // Tilde
 
     // bottom row
-    DEF_SELFINSERT_KEY_WITH_ALT(51, "\\", "|"), // Backslash
-    DEF_VARINSERT_KEY_WITH_ALT(52, "ST_Z0", "ST_Z1"), // z
-    DEF_VARINSERT_KEY_WITH_ALT(53, "ST_X0", "ST_X1"), // x
-    DEF_VARINSERT_KEY_WITH_ALT(54, "ST_C0", "ST_C1"), // c
-    DEF_SELFINSERT_KEY_WITH_ALT(55, "5", "%"), // v
-    DEF_VARINSERT_KEY_WITH_ALT(56, "ST_B0", "ST_B1"), // b
-    DEF_VARINSERT_KEY_WITH_ALT(57, "ST_N0", "ST_N1"), // n
-    DEF_SELFINSERT_KEY_WITH_ALT(58, "6", "^"), // m
-    DEF_SELFINSERT_KEY_WITH_ALT(59, ",", "<"), // ,
-    DEF_SELFINSERT_KEY_WITH_ALT(60, ".", ">"), // .
-    DEF_SELFINSERT_KEY_WITH_ALT(61, "/", "?"), // Slash
+    KEY_INSERT_0SC_ALT_CHR(51, "\\", "|"), // Backslash
+    KEY_INSERT_0SC_ALT_ENV(52, "ST_Z0", "ST_Z1"), // z
+    KEY_INSERT_0SC_ALT_ENV(53, "ST_X0", "ST_X1"), // x
+    KEY_INSERT_0SC_ALT_ENV(54, "ST_C0", "ST_C1"), // c
+    KEY_INSERT_0SC_ALT_CHR(55, "5", "%"), // v
+    KEY_INSERT_0SC_ALT_ENV(56, "ST_B0", "ST_B1"), // b
+    KEY_INSERT_0SC_ALT_ENV(57, "ST_N0", "ST_N1"), // n
+    KEY_INSERT_0SC_ALT_CHR(58, "6", "^"), // m
+    KEY_INSERT_0SC_ALT_CHR(59, ",", "<"), // ,
+    KEY_INSERT_0SC_ALT_CHR(60, ".", ">"), // .
+    KEY_INSERT_0SC_ALT_CHR(61, "/", "?"), // Slash
+
+    // space
+    KEY_INSERT_0S_ALT_CHR(65, " ", " "), // Space
 };
 
